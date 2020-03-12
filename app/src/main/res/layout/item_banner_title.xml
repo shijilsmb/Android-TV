@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) 2017 The Android Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+
+        <variable
+            name="user"
+            type="com.smb.smbapplication.data.model.User" />
+    </data>
+
+
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.hanks.htextview.typer.TyperTextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/name"
+                tools:text="name"
+                android:gravity="center"
+                android:textColor="@drawable/tab_text_selector"
+                android:fontFamily="@font/medium"
+                app:fontFamily="@font/medium"
+                app:layout_constraintStart_toStartOf="parent"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                app:charIncrease="1"
+                app:typerSpeed="80"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+
+        </FrameLayout>
+</layout>

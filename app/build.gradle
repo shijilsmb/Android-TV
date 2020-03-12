@@ -1,0 +1,147 @@
+apply plugin: 'com.android.application'
+
+apply plugin: 'jacoco'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+//apply plugin: 'kotlin-android-extensions'
+
+apply plugin: 'androidx.navigation.safeargs'
+
+
+
+android {
+    compileSdkVersion COMPILE_SDK_VERSION.toInteger()
+    buildToolsVersion buildToolsVersion
+
+    defaultConfig {
+        applicationId "com.smb.smbapplication"
+
+        minSdkVersion      MIN_SDK_VERSION.toInteger()
+        targetSdkVersion   TARGET_SDK_VERSION.toInteger()
+        versionCode        VERSION_CODE.toInteger()
+        versionName        VERSION_NAME
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    dataBinding {
+        enabled = true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+kapt {
+    generateStubs = true
+}
+
+jacoco {
+    toolVersion = "0.7.4+"
+}
+
+dependencies {
+
+    //:cropper1  :imagepicker1
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation project(path: ':nasutils')
+
+
+    //implementation 'com.android.support:support-v4:'+ rootProject.supportLibVersion
+    //kapt 'com.android.databinding:compiler:3.1.4'
+    // android support libraries
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    //implementation "org.jetbrains.anko:anko:0.10.5"
+    implementation 'org.apache.commons:commons-text:1.6'
+
+    implementation 'androidx.viewpager2:viewpager2:1.0.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+
+    //Support libs
+    implementation 'androidx.appcompat:appcompat:'+supportLibVersion
+    implementation 'androidx.constraintlayout:constraintlayout:'+constraintLayoutVersion
+    // Life cycle
+    implementation 'androidx.lifecycle:lifecycle-extensions:'+archLifecycleVersion
+    implementation 'androidx.lifecycle:lifecycle-common-java8:'+archLifecycleVersion
+    kapt 'androidx.lifecycle:lifecycle-compiler:'+archLifecycleVersion
+    // Room
+    implementation 'androidx.room:room-runtime:'+archRoomVersion
+    kapt 'androidx.room:room-compiler:'+archRoomVersion
+    //Paging
+    implementation 'androidx.paging:paging-runtime:'+archPaggingVersion
+    //Navigation
+    implementation 'androidx.navigation:navigation-fragment-ktx:'+archNavigationVersion
+    implementation 'androidx.navigation:navigation-ui-ktx:'+archNavigationVersion
+    // dependency injection
+    implementation 'com.google.dagger:dagger:' + dagger_version
+    implementation 'com.google.dagger:dagger-android:' + dagger_version
+    implementation 'com.google.dagger:dagger-android-support:' + dagger_version
+    kapt 'com.google.dagger:dagger-android-processor:' + dagger_version
+    kapt 'com.google.dagger:dagger-compiler:' + dagger_version
+    // Image Loading
+    implementation 'com.github.bumptech.glide:glide:' + glideVersion
+    kapt 'com.github.bumptech.glide:compiler:' + glideVersion
+    // retrofit webservice
+    implementation('com.squareup.retrofit2:retrofit:' + retrofitVersion) {
+        exclude module: 'okhttp-ws'
+    }
+    implementation('com.squareup.retrofit2:converter-gson:' + retrofitVersion) {
+        exclude module: 'okhttp-ws'
+    }
+    implementation 'com.squareup.okhttp3:logging-interceptor:' + okHttpVersion
+
+
+    def htextview_version = "0.1.6"
+// as 3.0 use implementation
+    implementation "com.hanks:htextview-base:$htextview_version"        // base library
+
+    implementation "com.hanks:htextview-typer:$htextview_version"       // optional
+   // implementation "com.hanks:htextview-scale:$htextview_version"
+}
+
+
+task fullCoverageReport(type: JacocoReport) {
+    dependsOn 'createDebugCoverageReport'
+    dependsOn 'testDebugUnitTest'
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+
+    def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*',
+                      '**/*Test*.*', 'android/**/*.*',
+                      '**/*_MembersInjector.class',
+                      '**/Dagger*Component.class',
+                      '**/Dagger*Component$Builder.class',
+                      '**/*_*Factory.class',
+                      '**/*ComponentImpl.class',
+                      '**/*SubComponentBuilder.class']
+    def debugTree = fileTree(dir: "${buildDir}/intermediates/classes/debug", excludes: fileFilter)
+    def mainSrc = "${project.projectDir}/src/main/java"
+
+    sourceDirectories = files([mainSrc])
+    classDirectories = files([debugTree])
+    executionData = fileTree(dir: "$buildDir", includes: [
+            "jacoco/testDebugUnitTest.exec",
+            "outputs/code-coverage/connected/*coverage.ec"
+    ])
+}
+
+// we need all open to run tests which  a we enable only for debug builds.
+project.tasks.whenTaskAdded {
+    if (it.name == "testReleaseUnitTest") {
+        it.enabled = false
+    }
+}
